@@ -41,7 +41,10 @@ chrome.storage.onChanged.addListener(function (changes, area) {
   if (area === 'sync' && 'timers' in changes) {
   
     console.log('timers changed in storage, refetching ...');
-    timers.fetch();
+    timers.fetch().done(function (timers) {
+
+      // dispatch changes to window for updating
+    });
   }
 });
 

@@ -1,15 +1,15 @@
 /* global $, _, LZString, Timer */
-
 'use strict';
 (function (global) {
 
-  var Storage = chrome.storage.sync;
+  var Storage = chrome.storage && chrome.storage.sync;
 
   // collection can be initialized with an array of timer objects
   var TimerCollection = function () {
 
     var self = this;
     self.timers = {};
+    self.timersSorted = [];
     self.lastId =  0;
   };
   var TimerCollectionProto = TimerCollection.prototype;
@@ -32,7 +32,41 @@
     timer.id = self.lastId;
     self.timers[timer.id] = timer;
 
+    self.timersSorted.push(timer);
+    self.sort();
+
     return timer;
+  };
+
+  TimerCollectionProto.remove = function (id) {
+
+    var self = this;
+    var timer = self.timers[id];
+    
+    if (timer) {
+      delete self.timers[id];
+      var index = _.findIndex(self.timersSorted, function (timer) {
+
+        return timer.id === id;
+      });
+
+      if ( ~index ) {
+        self.timersSorted.splice(index, 1);
+      }
+    }
+  };
+
+  TimerCollectionProto.sort = function () {
+
+    // keep array sorted by position
+    this.timersSorted.sort(function (a, b) {
+
+      var apos = a.position;
+      var bpos = b.position;
+
+      return apos < bpos ? -1 : apos > bpos ? 1 : 0;
+    });
+
   };
 
   TimerCollectionProto.toJSON = function () {
