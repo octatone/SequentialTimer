@@ -1,101 +1,105 @@
 /* global $, _, LZString, Timer */
 
 'use strict';
+(function () {
 
-var Storage = chrome.storage.sync;
+  var Storage = chrome.storage.sync;
 
-// collection can be initialized with an array of timer objects
-var TimerCollection = function () {
+  // collection can be initialized with an array of timer objects
+  var TimerCollection = function () {
 
-  var self = this;
-  self.timers = {};
-  self.lastId =  0;
-};
-var TimerCollectionProto = TimerCollection.prototype;
+    var self = this;
+    self.timers = {};
+    self.lastId =  0;
+  };
+  var TimerCollectionProto = TimerCollection.prototype;
 
-TimerCollectionProto.reset = function () {
+  TimerCollectionProto.reset = function () {
 
-  var self = this;
-  self.timers = {};
-  self.lastId = 0;
-};
+    var self = this;
+    self.timers = {};
+    self.lastId = 0;
+  };
 
-// add new timers to the collection
-TimerCollectionProto.add = function (data) {
+  // add new timers to the collection
+  TimerCollectionProto.add = function (data) {
 
-  var self = this;
+    var self = this;
 
-  var timer = new Timer(data);
+    var timer = new Timer(data);
 
-  ++self.lastId;
-  timer.id = self.lastId;
-  self.timers[timer.id] = timer;
+    ++self.lastId;
+    timer.id = self.lastId;
+    self.timers[timer.id] = timer;
 
-  return timer;
-};
+    return timer;
+  };
 
-TimerCollectionProto.toJSON = function () {
+  TimerCollectionProto.toJSON = function () {
 
-  var self = this;
-  var timersArray = [];
+    var self = this;
+    var timersArray = [];
 
-  if (_.size(self.timers)) {
+    if (_.size(self.timers)) {
 
-    timersArray = _.map(self.timers, function (timer) {
+      timersArray = _.map(self.timers, function (timer) {
 
-      return timer.toJSON();
-    });
-  }
-
-  return timersArray;
-};
-
-TimerCollectionProto.fetch = function () {
-
-  var self = this;
-  var deferred = new $.Deferred();
-  var timersString, timerObject;
-
-  Storage.get('timers', function (response) {
-
-    if (response.timers) {
-
-      self.reset();
-
-      timersString = LZString.decompressFromUTF16(response.timers);
-      try {
-        timerObject = JSON.parse(timersString);
-      }
-      catch (e) {
-        console.warn('unable to parse synced timers');
-      }
-
-      _.each(timerObject, function (timer) {
-
-        var timerClass = new Timer(timer);
-        self.timers[timerClass.id] = timerClass;
+        return timer.toJSON();
       });
-
-      self.lastId = _.size(self.timers);
     }
 
-    deferred.resolveWith(self.timers);
-  });
+    return timersArray;
+  };
 
-  return deferred.promise();
-};
+  TimerCollectionProto.fetch = function () {
 
-TimerCollectionProto._sync = function () {
+    var self = this;
+    var deferred = new $.Deferred();
+    var timersString, timerObject;
 
-  var self = this;
+    Storage.get('timers', function (response) {
 
-  Storage.set({
+      if (response.timers) {
 
-    'timers': LZString.compressToUTF16(JSON.stringify(self.toJSON()))
-  
-  }, function () {
+        self.reset();
 
-    console.log('timers synced');
-  });
-};
-TimerCollectionProto.sync = _.debounce(TimerCollectionProto._sync, 1000);
+        timersString = LZString.decompressFromUTF16(response.timers);
+        try {
+          timerObject = JSON.parse(timersString);
+        }
+        catch (e) {
+          console.warn('unable to parse synced timers');
+        }
+
+        _.each(timerObject, function (timer) {
+
+          var timerClass = new Timer(timer);
+          self.timers[timerClass.id] = timerClass;
+        });
+
+        self.lastId = _.size(self.timers);
+      }
+
+      deferred.resolveWith(self.timers);
+    });
+
+    return deferred.promise();
+  };
+
+  TimerCollectionProto._sync = function () {
+
+    var self = this;
+
+    Storage.set({
+
+      'timers': LZString.compressToUTF16(JSON.stringify(self.toJSON()))
+    
+    }, function () {
+
+      console.log('timers synced');
+    });
+  };
+  TimerCollectionProto.sync = _.debounce(TimerCollectionProto._sync, 1000);
+
+  window.TimerCollection = TimerCollection;
+})();

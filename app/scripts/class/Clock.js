@@ -1,34 +1,39 @@
 'use strict';
 
-var Clock = function () {
+(function () {
 
-  this.callbacks = [];
-};
-var ClockProto = Clock.prototype;
+  var Clock = function () {
 
-ClockProto.run = function () {
+    this.callbacks = [];
+  };
+  var ClockProto = Clock.prototype;
 
-  var self = this;
-  for (var i=0, len = self.callbacks.length; i < len; i++) {
-    self.callbacks[i]();
-  }
-};
+  ClockProto.run = function () {
 
-ClockProto.tick = function (callback) {
+    var self = this;
+    for (var i=0, len = self.callbacks.length; i < len; i++) {
+      self.callbacks[i]();
+    }
+  };
 
-  this.callbacks.push(callback);
-};
+  ClockProto.tick = function (callback) {
 
-ClockProto.start = function () {
+    this.callbacks.push(callback);
+  };
 
-  var self = this;
-  self.interval = setInterval(self.run.bind(self), 1000);
-};
+  ClockProto.start = function () {
 
-ClockProto.stop = function () {
+    var self = this;
+    self.interval = setInterval(self.run.bind(self), 1000);
+  };
 
-  var self = this;
-  if (self.interval) {
-    clearInterval(self.interval);
-  }
-};
+  ClockProto.stop = function () {
+
+    var self = this;
+    if (self.interval) {
+      clearInterval(self.interval);
+    }
+  };
+
+  window.Clock = Clock;
+})();
