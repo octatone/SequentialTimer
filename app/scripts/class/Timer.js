@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+(function (global) {
   var Timer = function (data) {
 
     var self = this;
@@ -63,5 +63,5 @@
     };
   };
 
-  window.Timer = Timer;
-})();
+  global.Timer = Timer;
+})(this);

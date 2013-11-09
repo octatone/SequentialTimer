@@ -1,7 +1,7 @@
 /* global $, _, LZString, Timer */
 
 'use strict';
-(function () {
+(function (global) {
 
   var Storage = chrome.storage.sync;
 
@@ -101,5 +101,5 @@
   };
   TimerCollectionProto.sync = _.debounce(TimerCollectionProto._sync, 1000);
 
-  window.TimerCollection = TimerCollection;
-})();
+  global.TimerCollection = TimerCollection;
+})(this);

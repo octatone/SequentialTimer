@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+(function (global) {
 
   var Clock = function () {
 
@@ -35,5 +35,5 @@
     }
   };
 
-  window.Clock = Clock;
-})();
+  global.Clock = Clock;
+})(this);
