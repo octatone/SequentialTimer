@@ -17,29 +17,29 @@ TODO
 ====
 
 background:
- - [x] timer class
- - [x] timer collection class
- - [x] timer collection sync via chrome sync
- - [x] clock class
- - [x] message/event handling 
- - [ ] desktop notifications
- - [ ] sounds/alarms?
+- [x] timer class
+- [x] timer collection class
+- [x] timer collection sync via chrome sync
+- [x] clock class
+- [x] message/event handling 
+- [ ] desktop notifications
+- [ ] sounds/alarms?
 
 window:
- - [x] base view with basic templating
- - [x] messaging/events to background
- - [ ] timer model (backbone - for item view)
- - [ ] timer item view
- - [ ] timer collection (backbown - for collection views)
- - [ ] timer collection view
- - [ ] timer countdown view
- - [ ] timer current and next view
- - [ ] timer start/stop view
- - [ ] settings view (i don't know what settings ... notifications? sounds?)
- - [ ] edit timer/timers view
+- [x] base view with basic templating
+- [x] messaging/events to background
+- [ ] timer model (backbone - for item view)
+- [ ] timer item view
+- [ ] timer collection (backbown - for collection views)
+- [ ] timer collection view
+- [ ] timer countdown view
+- [ ] timer current and next view
+- [ ] timer start/stop view
+- [ ] settings view (i don't know what settings ... notifications? sounds?)
+- [ ] edit timer/timers view
  
 
 assets:
- - [ ] sounds
- - [ ] app icon
- - [ ] app name!
+- [ ] sounds
+- [ ] app icon
+- [ ] app name!
