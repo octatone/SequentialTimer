@@ -2,10 +2,26 @@
 
 'use strict';
 
-chrome.runtime.sendMessage({
-  'event': 'test',
-  'data': {}
-});
+function sendMessage (eventName, data, callback) {
+
+  chrome.runtime.sendMessage({
+
+      'event': eventName,
+      'data': data
+    },
+    callback
+  );
+}
+
+// example usage
+// sendMessage('timer:add', {
+
+//   'label': 'Another timer',
+//   'duration': 15000
+// }, function (timer) {
+
+//   console.log('returned timer', timer);
+// });
 
 var templates = {};
 var getTemplate = function (selector) {

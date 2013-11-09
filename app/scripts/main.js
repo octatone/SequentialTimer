@@ -92,6 +92,8 @@ TimerCollectionProto.add = function (data) {
   ++self.lastId;
   timer.id = self.lastId;
   self.timers[timer.id] = timer;
+
+  return timer;
 };
 
 TimerCollectionProto.toJSON = function () {
@@ -123,7 +125,12 @@ TimerCollectionProto.fetch = function () {
       self.reset();
 
       timersString = LZString.decompressFromUTF16(response.timers);
-      timerObject = JSON.parse(timersString);
+      try {
+        timerObject = JSON.parse(timersString);
+      }
+      catch (e) {
+        console.warn('unable to parse synced timers');
+      }
 
       _.each(timerObject, function (timer) {
 
@@ -132,9 +139,9 @@ TimerCollectionProto.fetch = function () {
       });
 
       self.lastId = _.size(self.timers);
-
-      deferred.resolveWith(self.timers);
     }
+
+    deferred.resolveWith(self.timers);
   });
 
   return deferred.promise();
@@ -155,14 +162,6 @@ TimerCollectionProto._sync = function () {
 };
 TimerCollectionProto.sync = _.debounce(TimerCollectionProto._sync, 1000);
 
-// lets test some things
-
-var timers = new TimerCollection();
-timers.add({
-
-  'label': 'A timer.',
-  'duration': 10000
-});
 
 var Clock = function () {
 
@@ -197,16 +196,47 @@ ClockProto.stop = function () {
   }
 };
 
-chrome.runtime.onMessage.addListener(function () {
+/**
+  * Start some magic
+  */
 
-  console.log(arguments);
-});
+var timers = new TimerCollection();
+timers.fetch();
+
+// example data
+// timers.add({
+
+//   'label': 'A timer.',
+//   'duration': 10000
+// });
 
 var stopwatch = new Clock();
-
 stopwatch.tick(function () {
 
   console.log('tick');
+});
+
+chrome.runtime.onMessage.addListener(function (message, sender, callback) {
+
+  switch (message.event) {
+
+  case 'timer:add':
+    callback(timers.add(message.data).toJSON());
+    break;
+  default:
+    console.warn('message event not handled or missing');
+  }
+
+  console.log('message', arguments);
+});
+
+chrome.storage.onChanged.addListener(function (changes, area) {
+
+  if (area === 'sync' && 'timers' in changes) {
+  
+    console.log('timers changed in storage, refetching ...');
+    timers.fetch();
+  }
 });
 
 
@@ -220,23 +250,18 @@ stopwatch.tick(function () {
 var lastWindow;
 chrome.app.runtime.onLaunched.addListener(function() {
 
-  // only one window ever bitte
   if (lastWindow) {
     lastWindow.close();
   }
 
   chrome.app.window.create('index.html', {
-      width: 500,
-      height: 309
+      
+      'width': 500,
+      'height': 309
     },
     function (win) {
 
       lastWindow = win;
-
-      // var window = win.contentWindow;
-      // window.onload = function () {
-      //   main(window);
-      // };
     }
   );
 });
