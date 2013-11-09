@@ -12,6 +12,7 @@
         "background": {
           "scripts": [
             "scripts/libs.js",
+            "scripts/class.js",
             "scripts/main.js"
           ]
         }
