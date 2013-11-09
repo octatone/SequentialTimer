@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Timer</title>
+    
+    <!-- BUILD -->
+    
+    <!-- build:css styles/app.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+
+    <!-- build:js scripts/libs.js -->
+    <script src="scripts/vendor/lz-string-1.3.3.js"></script>
+    <script src="bower_components/handlebars/handlebars.js"></script>
+    <script src="bower_components/lodash/dist/lodash.js"></script>
+    <script src="bower_components/jquery/jquery.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js scripts/index-min.js -->
+    <script src="scripts/index.js"></script>
+    <!-- endbuild -->
+
+    <!-- END BUILD -->
+
+    <!-- actually loaded scripts -->
+    <script src="scripts/libs.js"></script>
+    <script src="scripts/index-min.js"></script>
+  </head>
+  <body>
+    <div class="countdown">
+    <button class="start">start</button>
+    <button class="stop">stop</button>
+
+    <input type="text" placeholder="Title"></input> <input type="text" placeholder="Duration"></input>
+
+    <!-- TEMPLATES -->
+    <script id="timer-template" type="text/x-handlebars-template">
+      <li>
+        <div class="timer-label">{{label}}</div>
+        <div class="timer-duration">{{duration}}</div>
+      </li>
+    </script>
+  </body>
+</html>
