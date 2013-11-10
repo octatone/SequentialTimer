@@ -60,7 +60,6 @@
   });
 
   function init () {
-
     timers.fetch().done(sendUpdate);
   }
 
