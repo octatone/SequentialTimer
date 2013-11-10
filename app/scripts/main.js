@@ -1,76 +1,92 @@
-/* global TimerCollection, Clock */
+/* global Timers, Clock */
+(function (global) {
+  
+  'use strict';
 
-'use strict';
+  /**
+    * Start some magic
+    */
 
-/**
-  * Start some magic
-  */
+  var timers, clock;
 
-var timers = new TimerCollection();
-timers.fetch();
+  function sendMessage (eventName, data, callback) {
 
-// example data
-// timers.add({
+    console.log('background sendMessage', arguments);
 
-//   'label': 'A timer.',
-//   'duration': 10000
-// });
+    chrome.runtime.sendMessage({
 
-var stopwatch = new Clock();
-stopwatch.tick(function () {
-
-  console.log('tick');
-});
-
-chrome.runtime.onMessage.addListener(function (message, sender, callback) {
-
-  switch (message.event) {
-
-  case 'timer:add':
-    callback(timers.add(message.data).toJSON());
-    break;
-  default:
-    console.warn('message event not handled or missing');
+        'event': eventName,
+        'data': data
+      },
+      callback
+    );
   }
 
-  console.log('message', arguments);
-});
+  function sendUpdate () {
 
-chrome.storage.onChanged.addListener(function (changes, area) {
+    sendMessage('update:timers', timers.toJSON(), function () {
 
-  if (area === 'sync' && 'timers' in changes) {
-  
-    console.log('timers changed in storage, refetching ...');
-    timers.fetch().done(function (timers) {
-
-      // dispatch changes to window for updating
+      console.log('window has updated its timers');
     });
   }
-});
 
+  timers = new Timers();
 
-/**
- * Listens for the app launching then creates the window
- *
- * @see http://developer.chrome.com/trunk/apps/experimental.app.html
- * @see http://developer.chrome.com/trunk/apps/app.window.html
- */
+  clock = new Clock();
+  clock.tick(function () {
 
-var lastWindow;
-chrome.app.runtime.onLaunched.addListener(function() {
+    console.log('tick');
+  });
 
-  if (lastWindow) {
-    lastWindow.close();
+  chrome.runtime.onMessage.addListener(function (message, sender, callback) {
+
+    switch (message.event) {
+
+    case 'timer:add':
+      callback(timers.add(message.data).toJSON());
+      break;
+    default:
+      console.warn('message event not handled or missing');
+    }
+  });
+
+  chrome.storage.onChanged.addListener(function (changes, area) {
+
+    if (area === 'sync' && 'timers' in changes) {
+    
+      console.log('timers changed in storage, refetching ...');
+      timers.fetch().done(sendUpdate);
+    }
+  });
+
+  function init () {
+
+    timers.fetch().done(sendUpdate);
   }
 
-  chrome.app.window.create('index.html', {
-      
-      'width': 500,
-      'height': 309
-    },
-    function (win) {
+  // "bootstrap"
+  var lastWindow;
+  chrome.app.runtime.onLaunched.addListener(function () {
 
-      lastWindow = win;
+    if (lastWindow) {
+      lastWindow.close();
     }
-  );
-});
+
+    chrome.app.window.create(
+      
+      'index.html',
+      
+      {
+        'width': 500,
+        'height': 309
+      },
+
+      function (win) {
+
+        lastWindow = win;
+        init();
+      }
+    );
+  });
+
+})(this);

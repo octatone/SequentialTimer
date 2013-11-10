@@ -21,11 +21,18 @@
     self.lastId = 0;
   };
 
+  TimerCollectionProto.resetTimers = function () {
+
+    var self = this;
+    for (var key in self.timers) {
+      self.timers[key].reset();
+    }
+  };
+
   // add new timers to the collection
   TimerCollectionProto.add = function (data) {
 
     var self = this;
-
     var timer = new Timer(data);
 
     ++self.lastId;
@@ -50,10 +57,58 @@
         return timer.id === id;
       });
 
-      if ( ~index ) {
+      if (~index) {
         self.timersSorted.splice(index, 1);
       }
     }
+  };
+
+  // get next timer (not dependent on running state)
+  TimerCollectionProto.getNext = function () {
+
+    var self = this;
+    var currentIndex = self.getActiveIndex();
+    var timer;
+
+    if (~currentIndex) {
+      timer = self.timersSorted[currentIndex + 1];
+    }
+    
+    if (!timer) {
+      timer = self.timersSorted[0];
+    }
+
+    return timer && timer;
+  };
+
+  // current timer (not dependent on running state)
+  // if none active return first timer and set active
+  TimerCollectionProto.getActive = function () {
+
+    var self = this;
+    var activeIndex = self.getActiveIndex();
+    var timer;
+
+    if (~activeIndex) {
+      timer = self.timersSorted[activeIndex];
+    }
+
+    if (!timer) {
+      timer = self.timersSorted[0];
+      if (timer) {
+        timer.setActive();
+      }
+    }
+
+    return timer && timer;
+  };
+
+  TimerCollectionProto.getActiveIndex = function () {
+
+    return _.findIndex(this.timersSorted, function (timer) {
+
+      return timer.active === true;
+    });
   };
 
   TimerCollectionProto.sort = function () {
@@ -135,5 +190,5 @@
   };
   TimerCollectionProto.sync = _.debounce(TimerCollectionProto._sync, 1000);
 
-  global.TimerCollection = TimerCollection;
+  global.Timers = TimerCollection;
 })(this);

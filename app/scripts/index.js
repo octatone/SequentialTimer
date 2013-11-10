@@ -4,6 +4,8 @@
 
 function sendMessage (eventName, data, callback) {
 
+  console.log('window sendMessage', arguments);
+
   chrome.runtime.sendMessage({
 
       'event': eventName,
@@ -12,6 +14,11 @@ function sendMessage (eventName, data, callback) {
     callback
   );
 }
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    // Do something with the message
+    console.log(arguments);
+});
 
 // example usage
 // sendMessage('timer:add', {

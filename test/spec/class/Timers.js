@@ -2,18 +2,18 @@
 'use strict';
 (function () {
 
-  var Topic = TimerCollection;
+  var Topic;
 
   beforeEach(function () {
 
-    Topic = new TimerCollection();
+    Topic = new Timers();
   });
 
-  describe('TimerCollection', function () {
+  describe('Timers (background)', function () {
 
     describe('#remove', function () {
 
-      it('should remove timer from hash and array', function () {
+      it('should remove timer from hash and sorted array', function () {
 
         Topic.add({
           'id': 1,

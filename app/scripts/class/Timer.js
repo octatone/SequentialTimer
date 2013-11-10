@@ -15,27 +15,43 @@
 
     self.startTime = undefined;
     self.running = false;
+    self.active = false;
   };
   var TimerProto = Timer.prototype;
 
   TimerProto.updateDuration = function (duration) {
-
     this.duration = duration;
+  };
+
+  TimerProto.setActive = function () {
+    this.active = true;
+  };
+
+  TimerProto.unsetActive = function () {
+    this.active = false;
+  };
+
+  TimerProto.setRunning = function () {
+    this.running = true;
+  };
+
+  TimerProto.unsetRunning = function () {
+    this.running = false;
   };
 
   TimerProto.start = function () {
 
     var self = this;
     self.startTime = Date.now();
-    self.running = true;
+    self.setRunning();
+    self.setActive();
   };
 
   TimerProto.stop = function () {
-
-    this.running = false;
+    this.unsetRunning();
   };
 
-  TimerProto.ended = function () {
+  TimerProto.checkHasEnded = function () {
 
     var self = this;
     if (self.startTime && self.running) {
@@ -48,7 +64,8 @@
   TimerProto.reset = function () {
 
     var self = this;
-    self.running = false;
+    self.unsetActive();
+    self.unsetRunning();
     self.startTime = undefined;
   };
 
